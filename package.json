@@ -19,12 +19,12 @@
     "ios"
   ],
   "bugs": {
-    "url": "https://github.com/tanersener/react-native-ffmpeg/issues"
+    "url": "https://github.com/diwgan32/react-native-ffmpeg/issues"
   },
-  "homepage": "https://github.com/tanersener/react-native-ffmpeg#readme",
+  "homepage": "https://github.com/diwgan32/react-native-ffmpeg#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tanersener/react-native-ffmpeg.git"
+    "url": "git+https://github.com/diwgan32/react-native-ffmpeg.git"
   },
   "peerDependencies": {
     "react-native": "^0.56.0"
