@@ -86,11 +86,13 @@ RCT_EXPORT_METHOD(executeFFmpegWithArguments:(NSArray*)arguments resolver:(RCTPr
     RCTLogInfo(@"Running FFmpeg with arguments: %@.\n", arguments);
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [RNFFmpegModule beginBackgroundUpdateTask];
         int rc = [MobileFFmpeg executeWithArguments:arguments];
 
         RCTLogInfo(@"FFmpeg exited with rc: %d\n", rc);
 
         resolve([RNFFmpegModule toIntDictionary:KEY_RC :[NSNumber numberWithInt:rc]]);
+        [RNFFmpegModule endBackgroundUpdateTask];
     });
 }
 
@@ -192,6 +194,19 @@ RCT_EXPORT_METHOD(getMediaInformation:(NSString*)path resolver:(RCTPromiseResolv
 RCT_EXPORT_METHOD(registerNewFFmpegPipe:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
     NSString *pipe = [MobileFFmpegConfig registerNewFFmpegPipe];
     resolve([RNFFmpegModule toStringDictionary:KEY_PIPE :pipe]);
+}
+
+- (void) beginBackgroundUpdateTask
+{
+    self.backgroundUpdateTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+        [self endBackgroundUpdateTask];
+    }];
+}
+
+- (void) endBackgroundUpdateTask
+{
+    [[UIApplication sharedApplication] endBackgroundTask: self.backgroundUpdateTask];
+    self.backgroundUpdateTask = UIBackgroundTaskInvalid;
 }
 
 - (void)logCallback: (int)level :(NSString*)message {
