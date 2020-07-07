@@ -39,3 +39,6 @@ buck-out/
 *.keystore
       
 /.gradle/
+
+# Android
+android/build

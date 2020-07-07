@@ -23,6 +23,10 @@
  */
 
 #import "RNFFmpegModule.h"
+
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+
 #import <React/RCTLog.h>
 #import <React/RCTBridge.h>
 #import <React/RCTEventDispatcher.h>
@@ -231,7 +235,8 @@ RCT_EXPORT_METHOD(registerNewFFmpegPipe:(RCTPromiseResolveBlock)resolve rejecter
 
 + (NSDictionary *)toStatisticsDictionary:(Statistics*)statistics {
     NSMutableDictionary *dictionary = [[NSMutableDictionary alloc] init];
-
+    NSTimeInterval timeRemaining = [UIApplication sharedApplication].backgroundTimeRemaining;
+    NSLog(@"Background time remaining: %f seconds (%d mins)", timeRemaining, (int)(timeRemaining / 60));
     if (statistics != nil) {
         dictionary[KEY_STAT_TIME] = [NSNumber numberWithInt: [statistics getTime]];
         dictionary[KEY_STAT_SIZE] = [NSNumber numberWithLong: [statistics getSize]];

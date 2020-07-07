@@ -48,10 +48,21 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
+import androidx.work.Data;
+import androidx.work.WorkInfo;
+import androidx.lifecycle.Observer;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.ArrayList;
 
 public class RNFFmpegModule extends ReactContextBaseJavaModule {
 
@@ -82,6 +93,8 @@ public class RNFFmpegModule extends ReactContextBaseJavaModule {
 
     private final ReactApplicationContext reactContext;
 
+    private static OneTimeWorkRequest mWorkRequest;
+
     public RNFFmpegModule(final ReactApplicationContext reactContext) {
         super(reactContext);
 
@@ -107,8 +120,40 @@ public class RNFFmpegModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void executeFFmpegWithArguments(final ReadableArray readableArray, final Promise promise) {
-        final RNFFmpegExecuteFFmpegAsyncArgumentsTask asyncTask = new RNFFmpegExecuteFFmpegAsyncArgumentsTask(promise, readableArray);
-        asyncTask.execute();
+        final List<String> arguments = new ArrayList<>();
+        for (int i = 0; i < readableArray.size(); i++) {
+            final ReadableType type = readableArray.getType(i);
+
+            if (type == ReadableType.String) {
+                arguments.add(readableArray.getString(i));
+            }
+        }
+        
+
+        final String[] argumentsArray = arguments.toArray(new String[0]);
+        mWorkRequest = new OneTimeWorkRequest.Builder(FFMpegAsyncWorker.class)
+            .setInputData(
+                new Data.Builder().putStringArray("ARGS", argumentsArray).build()
+            ).build();
+        WorkManager.getInstance(this.reactContext).enqueue(mWorkRequest);
+        promise.resolve("done");
+    }
+
+    @ReactMethod
+    public void checkStatus(final Promise promise) {
+        WorkInfo workInfo;
+        try {
+            workInfo = (WorkManager.getInstance(this.reactContext).getWorkInfoById(mWorkRequest.getId())).get();
+        } catch (Exception e) {
+            promise.resolve("error");
+            return;
+        }
+        
+        if (workInfo != null && workInfo.getState() == WorkInfo.State.SUCCEEDED) {
+            promise.resolve("done");
+            return;
+        }
+        promise.resolve("not done");
     }
 
     @ReactMethod
