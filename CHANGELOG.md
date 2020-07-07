@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 0.5.5 - 2020-07-07
+- Experimenting with backgrount tasks
+
 ## 0.4.4 - 2020-03-09
 - Fixes issue #118
 
