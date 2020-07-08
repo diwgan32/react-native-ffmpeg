@@ -329,6 +329,12 @@ class ReactNativeFFmpeg {
         return RNFFmpegModule.executeFFmpegWithArguments(this.parseArguments(command));
     }
 
+
+    checkStatus() {
+        return RNFFmpegModule.checkStatus();
+    }
+
+
     /**
      * Cancels an ongoing operation.
      */
