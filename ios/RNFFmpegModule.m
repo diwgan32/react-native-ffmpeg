@@ -59,7 +59,7 @@ static NSString *const KEY_STAT_VIDEO_FPS = @"videoFps";
 static NSString *const EVENT_LOG = @"RNFFmpegLogCallback";
 static NSString *const EVENT_STAT = @"RNFFmpegStatisticsCallback";
 
-static UIBackgroundTaskIdentifier backgroundUpdateTask = UIBackgroundTaskInvalid;
+static UIBackgroundTaskIdentifier backgroundUpdateTask = NULL;
 
 @implementation RNFFmpegModule
 
@@ -198,14 +198,14 @@ RCT_EXPORT_METHOD(registerNewFFmpegPipe:(RCTPromiseResolveBlock)resolve rejecter
     resolve([RNFFmpegModule toStringDictionary:KEY_PIPE :pipe]);
 }
 
-- (void) beginBackgroundUpdateTask
++ (void) beginBackgroundUpdateTask
 {
     backgroundUpdateTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
         [self endBackgroundUpdateTask];
     }];
 }
 
-- (void) endBackgroundUpdateTask
++ (void) endBackgroundUpdateTask
 {
     [[UIApplication sharedApplication] endBackgroundTask: backgroundUpdateTask];
     backgroundUpdateTask = UIBackgroundTaskInvalid;
